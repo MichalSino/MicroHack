@@ -11,6 +11,8 @@
   - [Challenge 3 - Create the Container App](#challenge-3---create-the-container-app)
   - [Challenge 4 - Make the Container App Production Ready](#challenge-4---make-the-container-app-production-ready)
   - [Challenge 5 - Host Your Own AI Models](#challenge-5---host-your-own-ai-models)
+  - [Challenge 6 - Calling Ollama model with the API](#challenge-6---calling-ollama-model-with-the-api)
+
 - [**Contributors**](#contributors)
 
 ## MicroHack Introduction
