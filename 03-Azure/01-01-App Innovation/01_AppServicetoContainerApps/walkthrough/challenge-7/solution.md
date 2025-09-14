@@ -51,6 +51,6 @@ Choose *Replic Count* to see that the number of containers has scaled.
 
 ![image](./img/challenge7-scaling.png)
 
-You successfully completed challenge 6! 🚀🚀🚀
+You successfully completed challenge 7! 🚀🚀🚀
 
  **[Home](../../Readme.md)**
