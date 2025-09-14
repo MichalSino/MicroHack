@@ -149,7 +149,7 @@ The final inbound policy may look like this:
 
 5. Then check by using Postman, Curl or other tool if you can see the limit being enforced. Make sure you call the API more than the limit you have configured.
 Make sure you use the URL to your API Management Gateway. Check the step 2 in [Task 4](#task-4-lets-chat-with-the-model-through-the-azure-api-management) if you are not sure. If you will try to call your `microhack-aiapp` app, the limit will not be enforced.
-![image](./img/challange6-limit.png)
+![image](./img/challenge6-rateLimit2.png)
 
 6. If you will want to experiment now you could change the code of the frontend app to use API Management Gateway but this is beyond this MicroHack.
 
