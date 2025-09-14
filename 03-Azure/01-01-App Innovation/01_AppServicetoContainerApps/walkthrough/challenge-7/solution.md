@@ -18,7 +18,7 @@ Open Git Bash or Azure Cloud Bash Shell to generate the traffic.
 
 Use the script below to do that.
 
-```
+```bash
 echo "Scaling test completed."
 
 APP_URL="https://microhack-aiapp.gentlepebble-c498cf3c.swedencentral.azurecontainerapps.io/api/tags"  # Replace with your app endpoint

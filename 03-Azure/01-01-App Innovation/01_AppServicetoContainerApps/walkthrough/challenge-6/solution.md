@@ -27,6 +27,11 @@ To do that, you have to know the Ollama container ingress endpoint taken from Az
 
 Then you may want to check the API of the Ollama local models by analyzing this one.
 
+*BEFORE YOU MOVE ON*
+You will need a ingress link for the Container App with the Ollama model.
+You can find this by openning the *Overview* tab in the Azure Portal for the Container App, the link will be visible under *Application URL*. Have a look on the screen below.
+![image](./img/challenge6-containerapps-ingreeslink.png)
+
 At first, we will get the list of all the models Ollama can offer by calling: 
 ```
 https://<microhack-aiapp ingress URL>/api/tags
@@ -36,7 +41,7 @@ The call may look like this:
 ![image](./img/challange6-listmodels.png)
 
 The response you can see in the image above but also below:
-```
+```json
 {
 	"models": [
 		{
@@ -70,7 +75,7 @@ https://<microhack-aiapp ingress URL/api/chat
 ```
 
 JSON request body of the content like below:
-```
+```json
 {
   "model": "llama3.2:latest",
   "stream":false,
@@ -88,7 +93,7 @@ The call will look like this:
 
 
 The answer you should see if the model is responding well will look like that:
-```
+```json
 {
 	"model": "llama3.2:latest",
 	"created_at": "2025-09-10T11:17:52.529134896Z",
@@ -112,19 +117,40 @@ The answer you should see if the model is responding well will look like that:
 What you have done in the past three tasks was a simple but not scalaable at all, especially if you want to expose services at scale. To change that, let's add Azure API Management which will help you to rate limit the calls which are coming.
 
 The challange is the following:
-1. Spin up a Developer SKU of Azure API Management
-2. Configure a simplt HTTP API to `microhack-aiapp` app
-3. The, for the inboud set of policies use [Limit call rate by key](https://learn.microsoft.com/en-us/azure/api-management/rate-limit-by-key-policy) policy. You can use for that purpose a sample:
-```
+1. Spin up a Developer SKU of Azure API Management. To do this:
+	- Go to Search tab at the top of Azure Portal and type: Azure API Management. ![image](./img/challenge6-createAPIM.png)
+	- Make sure to choose a Developer SKU and pick the same Resource Group, where you have the rest of you infrastructure. ![image](./img/challenge6-apimconfig.png)
+	- You can use the default settings for the rest of the parameters of Azure API Management
+
+2. Configure a simple HTTP API to `microhack-aiapp` app
+Follow the steps below and check the provided image to help you out with the task.
+- Open API's tab in Azure API Management Service in Azure Portal
+- Then click *Add API* and choose *HTTP API*
+- Providee the *Name* and *Display Name*
+- Put the *Web service URL* using the ingress link from [ask 1: Change the AI container so it's accept the traffic from anywhere](#task-1-change-the-ai-container-so-its-accept-the-traffic-from-anywhere)
+- Choose the API URL Suffix. In this particular task whatever name you pick is fine. If you expose many API's on your APIM, choosing the right one is imporant. Note down the link. As now, if you want to call specific API in Ollama you will use Azure API Management Gateway URL + API URL suffix + the API you want to call.
+Based on the screenshot we have provided the final link to API will go like this: https://apimgmt01mf.azure-api.net/ollama/api/chat, where *https://apimgmt01mf.azure-api.net* is Azure API Management Gateway URL, *ollama* is API URL suffix and */api/chat* is the API exposed by the Ollama in the container. 
+![image](./img/challenge6-configureAPI.png)
+
+3. Now you need to go to *Inbound processing* view for the API you have defiend to add the policy. To add a policy open the code of inbound processing using the icon "</>".
+![image](./img/challenge6-inboundProcessing.png)
+
+4. Then, add a policy [Limit call rate by key](https://learn.microsoft.com/en-us/azure/api-management/rate-limit-by-key-policy) policy. You can use for that purpose a sample:
+```xml
  <rate-limit-by-key calls="5"
               renewal-period="60"
               increment-condition="@(context.Response.StatusCode == 200)"
               counter-key="@(context.Request.IpAddress)"
               remaining-calls-variable-name="remainingCallsPerIP"/>
 ```
-4. Then check by using Postman, Curl or other tool if you can see the limit being enforced.
-Make sure you use the URL to your API Management rather than to your `microhack-aiapp` app
+The final inbound policy may look like this:
+![image](./img/challenge6-addingPolicy.png)
+
+5. Then check by using Postman, Curl or other tool if you can see the limit being enforced. Make sure you call the API more than the limit you have configured.
+Make sure you use the URL to your API Management Gateway. Check the step 2 in [Task 4](#task-4-lets-chat-with-the-model-through-the-azure-api-management) if you are not sure. If you will try to call your `microhack-aiapp` app, the limit will not be enforced.
 ![image](./img/challange6-limit.png)
+
+6. If you will want to experiment now you could change the code of the frontend app to use API Management Gateway but this is beyond this MicroHack.
 
 You successfully completed challenge 6! 🚀🚀🚀
 
