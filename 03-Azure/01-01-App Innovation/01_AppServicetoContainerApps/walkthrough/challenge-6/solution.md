@@ -1,6 +1,7 @@
 # Walkthrough Challenge 6 - Calling Ollama model with the API
 
-Duration: 30 minutes
+Duration: 60 minutes.
+*NOTE: It typically takes approximately 30 minutes to provision an Azure API Management instance.*
 
 ## Prerequisites
 
