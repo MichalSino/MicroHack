@@ -2,10 +2,10 @@
 
 Duration: 30 minutes
 
-## Prerequisites
+## Prerequisite
 Please make sure thet you successfully completed [Challenge 5](../challenge-5/solution.md) before continuing with this challenge.
 
-### **Task 1: Turn off the authentication for tha main app**
+### **Task 1: Turn off the authentication for tha main Container App**
 
 To do this, open the Container App in Azure Portal.
 On the left hand side look for *Security* and then *Authentication*.
@@ -14,18 +14,19 @@ Once there, turn off the Authentication as presented on the screen:
 
 ### **Task 2: Run the script to generate the traffic**
 
-Open Git Bash or Azure Cloud Bash Shell to generate the traffic. 
+Open Git Bash or Azure Cloud Bash Shell to generate the traffic.
 
-Use the script below to do that.
+Use the script below to do that. Make sure you have the right URL to ingress to the Container App.
 
 ```bash
 echo "Scaling test completed."
 
-APP_URL="https://microhack-aiapp.gentlepebble-c498cf3c.swedencentral.azurecontainerapps.io/api/tags"  # Replace with your app endpoint
-REQUESTS=1000                              # Number of requests to send
+# TODO: Replace with your ingress URL
+APP_URL="https://microhack-aiapp.gentlepebble-c498cf3c.swedencentral.azurecontainerapps.io/" 
+
+REQUESTS=1000 # Number of requests to send
 
 echo "Starting scaling test for $APP_URL"
-echo "Sending $REQUESTS requests with $DELAY second delay..."
 
 for i in $(seq 1 $REQUESTS); do
   START=$(date +%s%3N)
@@ -45,9 +46,9 @@ The script execution will work like this:
 
 ### **Task 3: Check that the number of containers has scaled**
 
-Please open the Container App, look for *Monitoring* on the left panel and then for *Metrics*.
+Please open the respective Container App, look for *Monitoring* on the left panel and then for *Metrics*.
 
-Choose *Replic Count* to see that the number of containers has scaled.
+Choose *Replica Count* to see that the number of containers has scaled.
 
 ![image](./img/challenge7-scaling.png)
 

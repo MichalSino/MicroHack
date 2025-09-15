@@ -1,24 +1,25 @@
 # Walkthrough Challenge 6 - Calling Ollama model with the API
 
 Duration: 60 minutes.
-*NOTE: It typically takes approximately 30 minutes to provision an Azure API Management instance.*
+*NOTE: It takes approximately 30 minutes to provision an Azure API Management instance.*
 
 ## Prerequisites
 
 Please make sure thet you successfully completed [Challenge 5](../challenge-5/solution.md) before continuing with this challenge.
 
-Please make sure you have one of those tools available: [Postman](https://www.postman.com/downloads/) or [insomnium](https://github.com/ArchGPT/insomnium)
+Please make sure you have one of those tools available: [Postman](https://www.postman.com/downloads/) or [insomnium](https://github.com/ArchGPT/insomnium) or [CURL](https://curl.se/docs/manpage.html) on your machine.
 
-### **Task 1: Change the AI container so it's accept the traffic from anywhere**
+### **Task 1: Change the AI container app so it can accept the traffic from anywhere**
 
-In the Azure Portal look for the Container App which is hosting an Ollama model. We have refered to it as `microhack-aiapp`. 
+In the Azure Portal look for the Container App which is hosting an Ollama model. We have refered to it as `microhack-aiapp`.
 
-In the *Network* tab of the Container App, you need to look for `Ingress` configuration. 
+In the *Network* tab of the Container App, you need to look for `Ingress` configuration.
+
 You need to change the *Ingress Traffic* option from *Limited to Container App Enviroment* to *Accepting traffic from anywhere*.
 
 ![image](./img/challange6-ingress.png)
 
-Now the access to Ollama model can happen from any source.
+Now the access to Ollama working inside the container can happen from any source.
 
 ### **Task 2: Test the Ollama model responses.**
 
@@ -26,22 +27,19 @@ Please open either the browser or one of the mentioned tools to generate a simpl
 
 To do that, you have to know the Ollama container ingress endpoint taken from Azure.
 
-Then you may want to check the API of the Ollama local models by analyzing this one.
-
 *BEFORE YOU MOVE ON*
 You will need a ingress link for the Container App with the Ollama model.
 You can find this by openning the *Overview* tab in the Azure Portal for the Container App, the link will be visible under *Application URL*. Have a look on the screen below.
 ![image](./img/challenge6-containerapps-ingreeslink.png)
 
-At first, we will get the list of all the models Ollama can offer by calling: 
+At first, we will get the list of all the models Ollama can offer by calling:
 ```
 https://<microhack-aiapp ingress URL>/api/tags
 ```
-
-The call may look like this: 
+The call may look like this:
 ![image](./img/challange6-listmodels.png)
 
-The response you can see in the image above but also below:
+The response:
 ```json
 {
 	"models": [
@@ -70,12 +68,12 @@ The response you can see in the image above but also below:
 
 So now, let's call the Ollama model to chat with it.
 
-In the tools of your choice (I am using Insomnium in here), create a simple POST request to API:
+In the tool of your choice (I am using Insomnium in here), create a simple POST request to API endpoint:
 ```
-https://<microhack-aiapp ingress URL/api/chat
+https://<microhack-aiapp ingress URL>/api/chat
 ```
 
-JSON request body of the content like below:
+JSON request body should look like below:
 ```json
 {
   "model": "llama3.2:latest",
@@ -89,11 +87,12 @@ JSON request body of the content like below:
 }
 ```
 
-The call will look like this: 
+Don't forget about the Headers, you need to add at least *Content-Type* header with *application/json* value.
+
+The call will look like this:
 ![image](./img/challange6-chat.png)
 
-
-The answer you should see if the model is responding well will look like that:
+The expected output will look like the one below:
 ```json
 {
 	"model": "llama3.2:latest",
@@ -121,15 +120,15 @@ The challange is the following:
 1. Spin up a Developer SKU of Azure API Management. To do this:
 	- Go to Search tab at the top of Azure Portal and type: Azure API Management. ![image](./img/challenge6-createAPIM.png)
 	- Make sure to choose a Developer SKU and pick the same Resource Group, where you have the rest of you infrastructure. ![image](./img/challenge6-apimconfig.png)
-	- You can use the default settings for the rest of the parameters of Azure API Management
+	- You can use the default settings for the rest of the parameters of Azure API Management.
 
-2. Configure a simple HTTP API to `microhack-aiapp` app
-Follow the steps below and check the provided image to help you out with the task.
+2. Configure a simple HTTP API to `microhack-aiapp` Container App
+Follow the steps below and check the provided images to help you out with the task.
 - Open API's tab in Azure API Management Service in Azure Portal
 - Then click *Add API* and choose *HTTP API*
-- Providee the *Name* and *Display Name*
+- Provide the *Name* and *Display Name*
 - Put the *Web service URL* using the ingress link from [ask 1: Change the AI container so it's accept the traffic from anywhere](#task-1-change-the-ai-container-so-its-accept-the-traffic-from-anywhere)
-- Choose the API URL Suffix. In this particular task whatever name you pick is fine. If you expose many API's on your APIM, choosing the right one is imporant. Note down the link. As now, if you want to call specific API in Ollama you will use Azure API Management Gateway URL + API URL suffix + the API you want to call.
+- Choose the API URL Suffix. In this particular task whatever name you pick is fine. If you expose many API's on your APIM, choosing the right one is important. Note down the link. As of now, if you want to call specific API in Ollama you will use Azure API Management Gateway URL + API URL suffix + the API you want to call.
 Based on the screenshot we have provided the final link to API will go like this: https://apimgmt01mf.azure-api.net/ollama/api/chat, where *https://apimgmt01mf.azure-api.net* is Azure API Management Gateway URL, *ollama* is API URL suffix and */api/chat* is the API exposed by the Ollama in the container. 
 ![image](./img/challenge6-configureAPI.png)
 
@@ -147,11 +146,11 @@ Based on the screenshot we have provided the final link to API will go like this
 The final inbound policy may look like this:
 ![image](./img/challenge6-addingPolicy.png)
 
-5. Then check by using Postman, Curl or other tool if you can see the limit being enforced. Make sure you call the API more than the limit you have configured.
-Make sure you use the URL to your API Management Gateway. Check the step 2 in [Task 4](#task-4-lets-chat-with-the-model-through-the-azure-api-management) if you are not sure. If you will try to call your `microhack-aiapp` app, the limit will not be enforced.
+5. Then check by using Postman, Curl or other tool we need to test if the limit will be enforced. Make sure you call the API more than the limit you have configured.
+Make sure you use the URL to your API Management Gateway. Check step 2 in [Task 4](#task-4-lets-chat-with-the-model-through-the-azure-api-management) if you are not sure. If you will try to call your `microhack-aiapp` app, the limit will not be enforced.
 ![image](./img/challenge6-rateLimit2.png)
 
-6. If you will want to experiment now you could change the code of the frontend app to use API Management Gateway but this is beyond this MicroHack.
+6. To experiment further you could change the code of the frontend app to use API Management Gateway but this is beyond this MicroHack.
 
 You successfully completed challenge 6! 🚀🚀🚀
 
